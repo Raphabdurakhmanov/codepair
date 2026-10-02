@@ -81,6 +81,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         )}
 
         <div className="card">
+          <div className="eyebrow">{t.project.team}</div>
           <h2>
             {t.project.team} ({members.length})
           </h2>
@@ -134,6 +135,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
       <aside className="stack">
         <div className="card">
+          <div className="eyebrow">Skill gap</div>
           <h3>{t.project.skillGap}</h3>
           {gap.length === 0 ? <p className="muted small">{t.project.gapNone}</p> : <Tags t={t} kind="roles" items={gap} variant="warn" />}
           {isOwner && project.status !== "done" && (

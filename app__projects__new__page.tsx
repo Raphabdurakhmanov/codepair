@@ -9,6 +9,7 @@ export default async function NewProjectPage() {
   const { t, locale } = await getDict();
   return (
     <div style={{ maxWidth: 760 }}>
+      <div className="eyebrow">{t.nav.projects}</div>
       <h1>{t.project.newTitle}</h1>
       <ProjectForm
         action={createProject}

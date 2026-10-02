@@ -20,6 +20,11 @@ const uz: Dict = {
     optional: "ixtiyoriy",
   },
   nav: {
+    theme: "Mavzu",
+    themeLight: "Yorug‘ mavzu",
+    themeDark: "Qorong‘i mavzu",
+    accent: "Aksent rangi",
+    workspace: "Talabalar jamoaviy ishi",
     dashboard: "Bosh sahifa",
     projects: "Loyihalar",
     people: "Odamlar",
@@ -27,6 +32,7 @@ const uz: Dict = {
     profile: "Profil",
   },
   landing: {
+    eyebrow: "Talabalar jamoalari platformasi",
     title: "G‘oyangizga jamoa toping — yoki ko‘nikmalaringizga g‘oya",
     subtitle:
       "CodePair talabalarni ko‘nikmalar, maqsadlar va loyihalar bo‘yicha bog‘laydi hamda jamoani natijaga olib chiqishga yordam beradi.",
@@ -200,6 +206,12 @@ const uz: Dict = {
     showAll: "Tugallanganlarni ham ko‘rsatish",
   },
   dashboard: {
+    overview: "Umumiy ko‘rinish",
+    profileReady: "profil to‘ldirilgan",
+    statProjects: "Loyihalarim",
+    statInbox: "Kiruvchilar",
+    statBest: "Eng yaxshi moslik",
+    live: "Onlayn",
     hello: "Salom, {name}!",
     myProjects: "Mening loyihalarim",
     noProjects: "Siz hali hech qaysi loyihada qatnashmayapsiz.",

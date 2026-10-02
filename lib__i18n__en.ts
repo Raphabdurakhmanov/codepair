@@ -20,6 +20,11 @@ const en: Dict = {
     optional: "optional",
   },
   nav: {
+    theme: "Theme",
+    themeLight: "Light theme",
+    themeDark: "Dark theme",
+    accent: "Accent color",
+    workspace: "Student team workspace",
     dashboard: "Home",
     projects: "Projects",
     people: "People",
@@ -27,6 +32,7 @@ const en: Dict = {
     profile: "Profile",
   },
   landing: {
+    eyebrow: "Student team platform",
     title: "Find a team for your idea — or an idea for your skills",
     subtitle: "CodePair connects students by skills, goals and projects, and helps teams get to a real result.",
     cta: "Get started",
@@ -199,6 +205,12 @@ const en: Dict = {
     showAll: "Show completed",
   },
   dashboard: {
+    overview: "Overview",
+    profileReady: "profile complete",
+    statProjects: "My projects",
+    statInbox: "Inbox",
+    statBest: "Best match",
+    live: "Live",
     hello: "Hi, {name}!",
     myProjects: "My projects",
     noProjects: "You are not in any project yet.",

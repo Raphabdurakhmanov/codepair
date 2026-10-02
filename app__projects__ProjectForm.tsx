@@ -100,7 +100,8 @@ export default function ProjectForm({
   return (
     <div className="stack">
       {!initial.id && (
-        <div className="card notice">
+        <div className="card card-accent">
+          <div className="eyebrow">AI</div>
           <h3>✨ {text.ai.title}</h3>
           <p className="small">{text.ai.hint}</p>
           <textarea value={idea} onChange={(e) => setIdea(e.target.value)} placeholder={text.ai.placeholder} maxLength={2000} />

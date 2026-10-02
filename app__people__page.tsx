@@ -66,6 +66,7 @@ export default async function PeoplePage({
 
   return (
     <>
+      <div className="eyebrow">{project ? "Matching" : t.nav.people}</div>
       <h1>{project ? fmt(t.people.forProject, { title: project.title }) : t.people.title}</h1>
       <p className="muted">{project ? t.people.forProjectHint : t.people.subtitle}</p>
 
@@ -76,7 +77,7 @@ export default async function PeoplePage({
         </div>
       )}
 
-      <form className="card row" style={{ marginBottom: 16 }}>
+      <form className="card row" style={{ marginBottom: 18, padding: 14 }}>
         {ownProjects.length > 0 && (
           <select name="project" defaultValue={project?.id ?? ""} style={{ width: "auto", maxWidth: 260 }} aria-label={t.nav.projects}>
             <option value="">— {t.people.pickProject}</option>

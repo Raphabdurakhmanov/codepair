@@ -19,7 +19,10 @@ export default async function ProfilePage({
     <div className="two-col">
       <div className="card">
         <div className="row between">
-          <h1>{t.profile.editTitle}</h1>
+          <div>
+            <div className="eyebrow">{t.nav.profile}</div>
+            <h1>{t.profile.editTitle}</h1>
+          </div>
           <Link href={`/u/${user.id}`} className="small">
             {t.profile.viewPublic} →
           </Link>
@@ -100,6 +103,7 @@ export default async function ProfilePage({
       </div>
 
       <aside className="card">
+        <div className="eyebrow">Signal</div>
         <h2>GitHub</h2>
         <p className="muted small">{t.profile.githubNote}</p>
         {sp.github === "notfound" && <p className="notice notice-warn small">{t.profile.githubNotFound}</p>}

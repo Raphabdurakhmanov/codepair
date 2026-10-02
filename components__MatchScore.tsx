@@ -34,6 +34,9 @@ export default function MatchScore({ t, match }: { t: Dict; match: MatchResult }
   return (
     <div>
       <Score t={t} value={match.score} />
+      <div className="meter">
+        <span style={{ width: `${match.score}%` }} />
+      </div>
       <ul className="reasons">
         {match.reasons.map((r, i) => (
           <li key={i} className={r.code === "covers_gap" ? "plus" : r.code === "duplicate_role" ? "minus" : ""}>

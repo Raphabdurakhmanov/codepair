@@ -14,8 +14,9 @@ export default async function Landing() {
   return (
     <>
       <section className="hero">
-        <p className="tag tag-accent">{t.common.tagline}</p>
-        <h1 style={{ marginTop: 16 }}>{t.landing.title}</h1>
+        <div className="eyebrow">{t.landing.eyebrow}</div>
+        <h1 style={{ marginTop: 12 }}>{t.landing.title}</h1>
+        <p className="tag tag-accent" style={{ marginBottom: 16 }}>{t.common.tagline}</p>
         <p>{t.landing.subtitle}</p>
         <Link href="/login" className="btn btn-primary btn-lg" style={{ marginTop: 12 }}>
           {t.landing.cta}
@@ -36,7 +37,8 @@ export default async function Landing() {
         ))}
       </div>
 
-      <div className="card notice" style={{ marginTop: 24 }}>
+      <div className="card card-accent" style={{ marginTop: 24 }}>
+        <div className="eyebrow">Matching</div>
         <h3>{t.landing.principleTitle}</h3>
         <p style={{ margin: 0 }}>{t.landing.principleText}</p>
       </div>

@@ -18,6 +18,11 @@ const ru = {
     optional: "необязательно",
   },
   nav: {
+    theme: "Тема",
+    themeLight: "Светлая тема",
+    themeDark: "Тёмная тема",
+    accent: "Цвет акцента",
+    workspace: "Командная работа студентов",
     dashboard: "Главная",
     projects: "Проекты",
     people: "Люди",
@@ -25,6 +30,7 @@ const ru = {
     profile: "Профиль",
   },
   landing: {
+    eyebrow: "Платформа студенческих команд",
     title: "Найди команду под свою идею — или идею под свои навыки",
     subtitle:
       "CodePair соединяет студентов по навыкам, целям и проектам и помогает довести команду до результата.",
@@ -198,6 +204,12 @@ const ru = {
     showAll: "Показывать завершённые",
   },
   dashboard: {
+    overview: "Обзор",
+    profileReady: "профиль заполнен",
+    statProjects: "Мои проекты",
+    statInbox: "Входящие",
+    statBest: "Лучшее совпадение",
+    live: "Онлайн",
     hello: "Привет, {name}!",
     myProjects: "Мои проекты",
     noProjects: "Вы пока не участвуете в проектах.",

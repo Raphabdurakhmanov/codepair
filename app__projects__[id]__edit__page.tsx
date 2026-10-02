@@ -16,6 +16,7 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
 
   return (
     <div style={{ maxWidth: 760 }}>
+      <div className="eyebrow">{t.nav.projects}</div>
       <h1>{t.project.editTitle}</h1>
       <ProjectForm
         action={updateProject}

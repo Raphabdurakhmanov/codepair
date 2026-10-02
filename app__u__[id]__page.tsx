@@ -65,7 +65,8 @@ export default async function PublicProfile({ params }: { params: Promise<{ id: 
         </div>
 
         <div className="card">
-          <h2>✓ {t.profile.verified}</h2>
+          <div className="eyebrow">Proof</div>
+          <h2>{t.profile.verified}</h2>
           {done.length === 0 ? (
             <p className="muted">{t.profile.noVerified}</p>
           ) : (

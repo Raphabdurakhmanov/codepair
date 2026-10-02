@@ -33,6 +33,20 @@ export async function setLocale(fd: FormData) {
   revalidatePath("/", "layout");
 }
 
+// ---------- appearance ----------
+
+export async function toggleTheme(fd: FormData) {
+  const next = fd.get("theme") === "light" ? "light" : "dark";
+  (await cookies()).set("theme", next, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+  revalidatePath("/", "layout");
+}
+
+export async function toggleAccent(fd: FormData) {
+  const next = fd.get("accent") === "red" ? "red" : "blue";
+  (await cookies()).set("accent", next, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+  revalidatePath("/", "layout");
+}
+
 // ---------- profile ----------
 
 export async function saveProfile(fd: FormData) {

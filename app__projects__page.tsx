@@ -41,13 +41,14 @@ export default async function ProjectsPage({
     <>
       <div className="section-title" style={{ marginTop: 0 }}>
         <div>
+          <div className="eyebrow">CodePair</div>
           <h1 style={{ margin: 0 }}>{t.projects.title}</h1>
           <p className="muted" style={{ margin: 0 }}>{t.projects.subtitle}</p>
         </div>
         <Link href="/projects/new" className="btn btn-primary">+ {t.nav.newProject}</Link>
       </div>
 
-      <form className="row" style={{ marginBottom: 16 }}>
+      <form className="card row" style={{ marginBottom: 18, padding: 14, borderRadius: 24 }}>
         <select name="role" defaultValue={sp.role ?? ""} style={{ width: "auto" }} aria-label={t.people.role}>
           <option value="">{t.people.role}: {t.common.all}</option>
           {ROLES.map((r) => (
