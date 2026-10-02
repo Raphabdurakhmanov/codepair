@@ -161,7 +161,7 @@ p { margin: 0 0 0.75em; }
 }
 .rail-logo {
   width: 54px; height: 54px; border-radius: 18px;
-  background: var(--text); color: var(--accent);
+  background: #0c1424; border: 1px solid var(--glass-border);
   display: grid; place-items: center;
   box-shadow: 0 8px 24px var(--accent-glow);
 }
@@ -223,7 +223,10 @@ p { margin: 0 0 0.75em; }
 .brand { font-weight: 800; font-size: 1.2rem; color: var(--text); letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; }
 .brand span { color: var(--accent); }
 .brand:hover { text-decoration: none; }
-.logo { color: var(--accent); display: inline-flex; }
+.logo { display: inline-flex; }
+.logo-a1 { stroke: var(--accent); }
+.logo-a2 { stroke: var(--accent-2); }
+.logo-dot { fill: var(--accent); }
 
 @media (max-width: 860px) {
   .app { padding: 12px 12px 96px; gap: 12px; }

@@ -7,17 +7,7 @@ import LangSwitcher from "./LangSwitcher";
 import NavLink from "./NavLink";
 import Icon from "./Icons";
 import Avatar from "./Avatar";
-
-function Logo() {
-  return (
-    <span className="logo" aria-hidden="true">
-      <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-        <rect x="3" y="3" width="14" height="14" rx="5" fill="currentColor" opacity=".55" />
-        <rect x="15" y="15" width="14" height="14" rx="5" fill="currentColor" />
-      </svg>
-    </span>
-  );
-}
+import Logo from "./Logo";
 
 export default async function Shell({ children }: { children: React.ReactNode }) {
   const { locale, t } = await getDict();
@@ -71,7 +61,7 @@ export default async function Shell({ children }: { children: React.ReactNode })
     <div className="app">
       <aside className="rail glass">
         <Link href="/dashboard" className="rail-logo" aria-label="CodePair">
-          <Logo />
+          <Logo size={30} />
         </Link>
         <nav className="rail-group">
           <NavLink href="/dashboard" title={t.nav.dashboard}><Icon name="home" /></NavLink>

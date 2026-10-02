@@ -8,7 +8,8 @@ export default function LoginButtons({ next, labels }: { next: string; labels: {
   async function signIn(provider: "github" | "google") {
     setBusy(provider);
     const supabase = createClient();
-    const site = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    // always return to the same domain the user started on (PKCE cookie lives there)
+    const site = window.location.origin;
     const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
     await supabase.auth.signInWithOAuth({
       provider,

@@ -6,11 +6,16 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   const nextParam = searchParams.get("next") ?? "/dashboard";
   const next = nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/dashboard";
+  let reason = searchParams.get("error_description") || searchParams.get("error") || "no_code";
 
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) return NextResponse.redirect(`${origin}${next}`);
+    reason = error.message;
+    console.error("auth callback: exchange failed", error);
+  } else {
+    console.error("auth callback: no code", reason);
   }
-  return NextResponse.redirect(`${origin}/login?error=auth`);
+  return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(reason.slice(0, 200))}`);
 }
