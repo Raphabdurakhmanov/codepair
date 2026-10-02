@@ -17,15 +17,6 @@ export default async function PeoplePage({
   const { t } = await getDict();
   const { supabase, user } = await requireUser();
 
-  // projects I own and can recruit for
-  const { data: ownData } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("owner_id", user.id)
-    .neq("status", "done")
-    .order("created_at", { ascending: false });
-  const ownProjects = (ownData ?? []) as Project[];
-  const project = ownProjects.find((p) => p.id === sp.project) ?? null;
 
   // people query
   let q = supabase.from("profiles").select("*").neq("id", user.id).limit(300);
@@ -33,7 +24,17 @@ export default async function PeoplePage({
   if (sp.skill && SKILLS.some((s) => s.id === sp.skill)) q = q.contains("skills", [sp.skill]);
   const text = (sp.q ?? "").replace(/[,()%*\\]/g, " ").trim().slice(0, 60);
   if (text) q = q.or(`full_name.ilike.%${text}%,university.ilike.%${text}%,bio.ilike.%${text}%`);
-  const { data: peopleData } = await q;
+  const [{ data: ownData }, { data: peopleData }] = await Promise.all([
+    supabase
+      .from("projects")
+      .select("*")
+      .eq("owner_id", user.id)
+      .neq("status", "done")
+      .order("created_at", { ascending: false }),
+    q,
+  ]);
+  const ownProjects = (ownData ?? []) as Project[];
+  const project = ownProjects.find((p) => p.id === sp.project) ?? null;
   const people = ((peopleData ?? []) as Profile[]).filter((p) => p.roles.length > 0);
 
   // matching context
@@ -43,11 +44,14 @@ export default async function PeoplePage({
   let gap: string[] = [];
 
   if (project) {
-    const members = await loadMembers(supabase, [project.id]);
+    const [members, counts, { data: inv }] = await Promise.all([
+      loadMembers(supabase, [project.id]),
+      completedCounts(supabase, people.map((p) => p.id)),
+      supabase.from("invitations").select("*").eq("project_id", project.id).eq("kind", "invite").eq("status", "pending"),
+    ]);
     memberIds = new Set(members.map((m) => m.user_id));
     const teamRoles = teamRolesFor(members);
     gap = skillGap(project, teamRoles);
-    const counts = await completedCounts(supabase, people.map((p) => p.id));
     const byId = new Map(people.map((p) => [p.id, p]));
     ranked = rankPeople(
       people.filter((p) => !memberIds.has(p.id)).map((p) => toMatchPerson(p, counts[p.id] ?? 0)),
@@ -55,12 +59,6 @@ export default async function PeoplePage({
       teamRoles,
     ).map((r) => ({ person: byId.get(r.person.id)!, match: r.match }));
 
-    const { data: inv } = await supabase
-      .from("invitations")
-      .select("*")
-      .eq("project_id", project.id)
-      .eq("kind", "invite")
-      .eq("status", "pending");
     invitedIds = new Set(((inv ?? []) as Invitation[]).map((i) => i.to_user));
   }
 

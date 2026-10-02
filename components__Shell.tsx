@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { getMyProfile, getSession } from "@/lib/data";
 import { getDict } from "@/lib/i18n";
 import { getAppearance } from "@/lib/theme";
 import { toggleAccent, toggleTheme } from "@/app/actions";
@@ -12,10 +12,7 @@ import Logo from "./Logo";
 export default async function Shell({ children }: { children: React.ReactNode }) {
   const { locale, t } = await getDict();
   const { theme, accent } = await getAppearance();
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await getSession();
 
   const themeSwitch = (
     <form action={toggleTheme}>
@@ -55,7 +52,7 @@ export default async function Shell({ children }: { children: React.ReactNode })
     );
   }
 
-  const { data: profile } = await supabase.from("profiles").select("full_name, avatar_url, university").eq("id", user.id).maybeSingle();
+  const profile = await getMyProfile();
 
   return (
     <div className="app">

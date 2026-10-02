@@ -26,22 +26,23 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   if (!data) notFound();
   const project = data as Project;
 
-  const members = await loadMembers(supabase, [id]);
+  const [members, { data: myReq }] = await Promise.all([
+    loadMembers(supabase, [id]),
+    supabase
+      .from("invitations")
+      .select("*")
+      .eq("project_id", id)
+      .eq("from_user", user.id)
+      .eq("kind", "request")
+      .eq("status", "pending")
+      .maybeSingle(),
+  ]);
   const teamRoles = teamRolesFor(members);
   const gap = skillGap(project, teamRoles);
   const isOwner = project.owner_id === user.id;
   const me = members.find((m) => m.user_id === user.id);
   const owner = members.find((m) => m.user_id === project.owner_id);
 
-  // my pending join request (if any)
-  const { data: myReq } = await supabase
-    .from("invitations")
-    .select("*")
-    .eq("project_id", id)
-    .eq("from_user", user.id)
-    .eq("kind", "request")
-    .eq("status", "pending")
-    .maybeSingle();
   const pendingRequest = myReq as Invitation | null;
 
   const myMatch = !me ? scoreMatch(toMatchPerson(profile), project, teamRoles) : null;

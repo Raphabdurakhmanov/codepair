@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { githubLanguageToSkill, isRole } from "@/lib/catalog";
@@ -59,29 +60,40 @@ export interface Invitation {
   created_at: string;
 }
 
-/** Current user + profile, or redirect to /login. */
-export async function requireUser() {
+/** Current session — cached per request, so layout and page share one auth call. */
+export const getSession = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  return { supabase, user };
+});
+
+/** Current user's profile — cached per request. Creates it if the sign-up trigger did not run. */
+export const getMyProfile = cache(async (): Promise<Profile | null> => {
+  const { supabase, user } = await getSession();
+  if (!user) return null;
+  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
+  if (profile) return profile as Profile;
+  const meta = user.user_metadata ?? {};
+  const { data } = await supabase
+    .from("profiles")
+    .insert({
+      id: user.id,
+      full_name: meta.full_name ?? meta.name ?? "",
+      avatar_url: meta.avatar_url ?? null,
+      github_username: meta.user_name ?? "",
+    })
+    .select("*")
+    .single();
+  return (data as Profile) ?? null;
+});
+
+/** Current user + profile, or redirect to /login. */
+export async function requireUser() {
+  const { supabase, user } = await getSession();
   if (!user) redirect("/login");
-  let { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
-  if (!profile) {
-    // safety net in case the sign-up trigger did not run
-    const meta = user.user_metadata ?? {};
-    const { data } = await supabase
-      .from("profiles")
-      .insert({
-        id: user.id,
-        full_name: meta.full_name ?? meta.name ?? "",
-        avatar_url: meta.avatar_url ?? null,
-        github_username: meta.user_name ?? "",
-      })
-      .select("*")
-      .single();
-    profile = data;
-  }
+  const profile = await getMyProfile();
   return { supabase, user, profile: profile as Profile };
 }
 

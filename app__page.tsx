@@ -1,14 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getSession } from "@/lib/data";
 import { getDict } from "@/lib/i18n";
 import LegalLinks from "@/components/LegalLinks";
 
 export default async function Landing() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await getSession();
   if (user) redirect("/dashboard");
   const { t, locale } = await getDict();
 

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getSession } from "@/lib/data";
 import { getDict } from "@/lib/i18n";
 import LoginButtons from "./LoginButtons";
 import Logo from "@/components/Logo";
@@ -8,10 +8,7 @@ import LegalLinks from "@/components/LegalLinks";
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {
   const { t, locale } = await getDict();
   const sp = await searchParams;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await getSession();
   if (user) redirect("/dashboard");
 
   return (

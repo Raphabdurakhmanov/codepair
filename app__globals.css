@@ -64,7 +64,7 @@
   --r-md: 16px;
   --r-sm: 12px;
   --blur: blur(22px) saturate(140%);
-  font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-manrope), "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 /* ============ BASE ============ */
@@ -113,6 +113,9 @@ p { margin: 0 0 0.75em; }
   background: linear-gradient(160deg, var(--glass-strong), var(--glass));
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow), inset 0 1px 0 var(--glass-highlight);
+}
+/* real blur only on the few sticky surfaces — blurring every card is slow on weaker laptops */
+.glass {
   backdrop-filter: var(--blur);
   -webkit-backdrop-filter: var(--blur);
 }
@@ -402,5 +405,10 @@ details.inline summary::-webkit-details-marker { display: none; }
 details.inline[open] summary { margin-bottom: 10px; }
 
 @supports not (backdrop-filter: blur(1px)) {
-  .glass, .card { background: var(--bg-2); }
+  .glass { background: var(--bg-2); }
 }
+
+/* loading skeleton */
+.skeleton { border-radius: var(--r-xl); background: linear-gradient(90deg, var(--glass), var(--glass-strong), var(--glass)); background-size: 200% 100%; animation: shimmer 1.2s infinite linear; border: 1px solid var(--glass-border); }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }

@@ -10,39 +10,35 @@ export default async function Dashboard() {
   const { t } = await getDict();
   const { supabase, user, profile } = await requireUser();
 
-  // invitations (both directions)
-  const { data: invData } = await supabase
-    .from("invitations")
-    .select("*")
-    .or(`to_user.eq.${user.id},from_user.eq.${user.id}`)
-    .order("created_at", { ascending: false })
-    .limit(50);
+  // wave 1: independent queries in parallel
+  const [{ data: invData }, { data: memberRows }, { data: openData }] = await Promise.all([
+    supabase
+      .from("invitations")
+      .select("*")
+      .or(`to_user.eq.${user.id},from_user.eq.${user.id}`)
+      .order("created_at", { ascending: false })
+      .limit(50),
+    supabase.from("project_members").select("project_id").eq("user_id", user.id),
+    supabase.from("projects").select("*").eq("status", "open").order("created_at", { ascending: false }).limit(100),
+  ]);
   const invitations = (invData ?? []) as Invitation[];
   const incoming = invitations.filter((i) => i.to_user === user.id && i.status === "pending");
   const sent = invitations.filter((i) => i.from_user === user.id).slice(0, 10);
-
-  // my projects
-  const { data: memberRows } = await supabase.from("project_members").select("project_id").eq("user_id", user.id);
   const myIds: string[] = (memberRows ?? []).map((r: { project_id: string }) => r.project_id);
+  const open = ((openData ?? []) as Project[]).filter((p) => !myIds.includes(p.id));
 
-  // everything we need to render titles / names
+  // wave 2: details that depend on wave 1, also in parallel
   const relatedProjectIds = [...new Set([...myIds, ...invitations.map((i) => i.project_id)])];
-  const { data: projData } = relatedProjectIds.length
-    ? await supabase.from("projects").select("*").in("id", relatedProjectIds)
-    : { data: [] };
-  const projectsById = new Map(((projData ?? []) as Project[]).map((p) => [p.id, p]));
   const peopleIds = [...new Set(invitations.flatMap((i) => [i.from_user, i.to_user]))];
-  const { data: pplData } = peopleIds.length ? await supabase.from("profiles").select("*").in("id", peopleIds) : { data: [] };
+  const [{ data: projData }, { data: pplData }, openMembers] = await Promise.all([
+    relatedProjectIds.length ? supabase.from("projects").select("*").in("id", relatedProjectIds) : Promise.resolve({ data: [] }),
+    peopleIds.length ? supabase.from("profiles").select("*").in("id", peopleIds) : Promise.resolve({ data: [] }),
+    loadMembers(supabase, open.map((p) => p.id)),
+  ]);
+  const projectsById = new Map(((projData ?? []) as Project[]).map((p) => [p.id, p]));
   const peopleById = new Map(((pplData ?? []) as Profile[]).map((p) => [p.id, p]));
-
   const myProjects = myIds.map((id) => projectsById.get(id)).filter((p): p is Project => !!p);
 
-  // recommendations: open projects I'm not in
-  let recQuery = supabase.from("projects").select("*").eq("status", "open").order("created_at", { ascending: false }).limit(100);
-  if (myIds.length) recQuery = recQuery.not("id", "in", `(${myIds.join(",")})`);
-  const { data: openData } = await recQuery;
-  const open = (openData ?? []) as Project[];
-  const openMembers = await loadMembers(supabase, open.map((p) => p.id));
   const me = toMatchPerson(profile);
   const recommended = open
     .map((p) => ({ p, match: scoreMatch(me, p, teamRolesFor(openMembers.filter((m) => m.project_id === p.id))) }))
