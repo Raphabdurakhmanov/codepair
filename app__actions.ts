@@ -100,7 +100,8 @@ export async function connectTelegram() {
   const bot = (process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME ?? "").replace(/^@/, "");
   const { data, error } = await supabase.rpc("telegram_create_link_token");
   if (error || !data || !bot) redirect("/profile?telegram=error");
-  redirect(`https://t.me/${bot}?start=${data}`);
+  // show both options (app and Telegram Web) on the profile page
+  redirect("/profile?telegram=open#telegram");
 }
 
 export async function disconnectTelegram() {

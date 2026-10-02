@@ -95,6 +95,10 @@ const uz: Dict = {
     done: "Tugallangan",
   },
   profile: {
+    tgOpenApp: "Telegram ilovasida ochish",
+    tgOpenWeb: "Telegram Web’da ochish",
+    tgManual: "Yoki botni topib, unga ushbu buyruqni yuboring:",
+    tgStep: "2-qadam: botni oching va «Start» tugmasini bosing.",
     tgTitle: "Telegram bildirishnomalari",
     tgHint: "Takliflar, arizalar, rolingizga mos yangi loyihalar va loyihalar tugashi — darhol Telegramda.",
     tgConnect: "Telegramni ulash",

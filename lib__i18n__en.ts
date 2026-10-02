@@ -94,6 +94,10 @@ const en: Dict = {
     done: "Completed",
   },
   profile: {
+    tgOpenApp: "Open in the Telegram app",
+    tgOpenWeb: "Open in Telegram Web",
+    tgManual: "Or find the bot and send it this command:",
+    tgStep: "Step 2 of 2: open the bot and press “Start”.",
     tgTitle: "Telegram notifications",
     tgHint: "Invitations, join requests, new projects for your role and completed projects — right in Telegram.",
     tgConnect: "Connect Telegram",

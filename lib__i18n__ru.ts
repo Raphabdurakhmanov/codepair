@@ -93,6 +93,10 @@ const ru = {
     done: "Завершён",
   } as Record<string, string>,
   profile: {
+    tgOpenApp: "Открыть в приложении Telegram",
+    tgOpenWeb: "Открыть в Telegram Web",
+    tgManual: "Или найдите бота и отправьте ему команду:",
+    tgStep: "Шаг 2 из 2: откройте бота и нажмите «Start» (или «Запустить»).",
     tgTitle: "Уведомления в Telegram",
     tgHint: "Приглашения, заявки, новые проекты под вашу роль и завершение проектов — сразу в Telegram.",
     tgConnect: "Подключить Telegram",

@@ -17,6 +17,7 @@ export default async function ProfilePage({
     .select("chat_id, enabled, link_token")
     .eq("user_id", user.id)
     .maybeSingle();
+  const bot = (process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME ?? "").replace(/^@/, "");
   const tg = tgLink as { chat_id: number | null; enabled: boolean; link_token: string | null } | null;
   const sp = await searchParams;
   const p = profile;
@@ -109,7 +110,7 @@ export default async function ProfilePage({
       </div>
 
       <aside className="stack">
-      <div className="card">
+      <div className="card" id="telegram">
         <div className="eyebrow">Telegram</div>
         <h2>{t.profile.tgTitle}</h2>
         <p className="muted small">{t.profile.tgHint}</p>
@@ -127,12 +128,36 @@ export default async function ProfilePage({
           </>
         ) : (
           <>
-            {tg?.link_token && <p className="notice small">{t.profile.tgPending}</p>}
-            <form action={connectTelegram}>
-              <button className="btn btn-primary" type="submit">
-                ✈ {t.profile.tgConnect}
-              </button>
-            </form>
+            {tg?.link_token && bot ? (
+              <div className="stack">
+                <p className="notice small">{t.profile.tgStep}</p>
+                <a className="btn btn-primary" href={`https://t.me/${bot}?start=${tg.link_token}`} target="_blank" rel="noreferrer">
+                  ✈ {t.profile.tgOpenApp}
+                </a>
+                <a
+                  className="btn"
+                  href={`https://web.telegram.org/k/#?tgaddr=${encodeURIComponent(`tg://resolve?domain=${bot}&start=${tg.link_token}`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  🌐 {t.profile.tgOpenWeb}
+                </a>
+                <div className="small muted">
+                  {t.profile.tgManual}
+                  <code style={{ display: "block", marginTop: 6, padding: "8px 10px", borderRadius: 10, background: "var(--glass-strong)", userSelect: "all", wordBreak: "break-all" }}>
+                    /start {tg.link_token}
+                  </code>
+                  <span>@{bot}</span>
+                </div>
+                <p className="hint">{t.profile.tgPending}</p>
+              </div>
+            ) : (
+              <form action={connectTelegram}>
+                <button className="btn btn-primary" type="submit">
+                  ✈ {t.profile.tgConnect}
+                </button>
+              </form>
+            )}
           </>
         )}
       </div>
