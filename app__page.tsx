@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getDict } from "@/lib/i18n";
+import LegalLinks from "@/components/LegalLinks";
 
 export default async function Landing() {
   const supabase = await createClient();
@@ -9,7 +10,7 @@ export default async function Landing() {
     data: { user },
   } = await supabase.auth.getUser();
   if (user) redirect("/dashboard");
-  const { t } = await getDict();
+  const { t, locale } = await getDict();
 
   return (
     <>
@@ -42,6 +43,7 @@ export default async function Landing() {
         <h3>{t.landing.principleTitle}</h3>
         <p style={{ margin: 0 }}>{t.landing.principleText}</p>
       </div>
+      <LegalLinks locale={locale} />
     </>
   );
 }

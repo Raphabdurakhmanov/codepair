@@ -3,9 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import { getDict } from "@/lib/i18n";
 import LoginButtons from "./LoginButtons";
 import Logo from "@/components/Logo";
+import LegalLinks from "@/components/LegalLinks";
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {
-  const { t } = await getDict();
+  const { t, locale } = await getDict();
   const sp = await searchParams;
   const supabase = await createClient();
   const {
@@ -32,6 +33,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </p>
       )}
       <LoginButtons next={sp.next ?? "/dashboard"} labels={{ github: t.login.github, google: t.login.google }} />
+      <LegalLinks locale={locale} />
     </div>
   );
 }
