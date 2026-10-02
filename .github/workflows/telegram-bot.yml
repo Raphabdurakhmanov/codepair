@@ -1,0 +1,27 @@
+name: CodePair Telegram bot
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # every 5 minutes; each run works ~5 minutes → bot is almost always online
+  workflow_dispatch:         # "Run workflow" button for a manual start
+
+concurrency:
+  group: codepair-telegram-bot
+  cancel-in-progress: false
+
+jobs:
+  bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run bot for ~5 minutes
+        run: python codepair_bot.py --duration 290
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          SITE_URL: https://codepair-swart.vercel.app
