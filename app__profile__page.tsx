@@ -2,16 +2,22 @@ import Link from "next/link";
 import { requireUser } from "@/lib/data";
 import { getDict, fmt } from "@/lib/i18n";
 import { INTERESTS, LEVELS, ROLES, SKILLS } from "@/lib/catalog";
-import { saveProfile, syncGithub } from "@/app/actions";
+import { saveProfile, syncGithub, connectTelegram, disconnectTelegram } from "@/app/actions";
 import ChipGroup from "@/components/ChipGroup";
 
 export default async function ProfilePage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; github?: string }>;
+  searchParams: Promise<{ saved?: string; github?: string; telegram?: string }>;
 }) {
   const { t } = await getDict();
-  const { user, profile } = await requireUser();
+  const { supabase, user, profile } = await requireUser();
+  const { data: tgLink } = await supabase
+    .from("telegram_links")
+    .select("chat_id, enabled, link_token")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  const tg = tgLink as { chat_id: number | null; enabled: boolean; link_token: string | null } | null;
   const sp = await searchParams;
   const p = profile;
 
@@ -102,7 +108,35 @@ export default async function ProfilePage({
         </form>
       </div>
 
-      <aside className="card">
+      <aside className="stack">
+      <div className="card">
+        <div className="eyebrow">Telegram</div>
+        <h2>{t.profile.tgTitle}</h2>
+        <p className="muted small">{t.profile.tgHint}</p>
+        {sp.telegram === "error" && <p className="notice notice-warn small">{t.profile.tgError}</p>}
+        {tg?.chat_id ? (
+          <>
+            <p className={`notice small ${tg.enabled ? "notice-good" : "notice-warn"}`}>
+              {tg.enabled ? t.profile.tgConnected : t.profile.tgMuted}
+            </p>
+            <form action={disconnectTelegram}>
+              <button className="btn btn-sm btn-ghost btn-danger" type="submit">
+                {t.profile.tgDisconnect}
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            {tg?.link_token && <p className="notice small">{t.profile.tgPending}</p>}
+            <form action={connectTelegram}>
+              <button className="btn btn-primary" type="submit">
+                ✈ {t.profile.tgConnect}
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+      <div className="card">
         <div className="eyebrow">Signal</div>
         <h2>GitHub</h2>
         <p className="muted small">{t.profile.githubNote}</p>
@@ -130,6 +164,7 @@ export default async function ProfilePage({
             {t.profile.syncGithub}
           </button>
         </form>
+      </div>
       </aside>
     </div>
   );

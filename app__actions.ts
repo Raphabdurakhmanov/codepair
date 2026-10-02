@@ -93,6 +93,22 @@ export async function syncGithub() {
   redirect("/profile?github=ok");
 }
 
+// ---------- telegram ----------
+
+export async function connectTelegram() {
+  const { supabase } = await authed();
+  const bot = (process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME ?? "").replace(/^@/, "");
+  const { data, error } = await supabase.rpc("telegram_create_link_token");
+  if (error || !data || !bot) redirect("/profile?telegram=error");
+  redirect(`https://t.me/${bot}?start=${data}`);
+}
+
+export async function disconnectTelegram() {
+  const { supabase } = await authed();
+  await supabase.rpc("telegram_disconnect");
+  revalidatePath("/profile");
+}
+
 // ---------- projects ----------
 
 function projectFields(fd: FormData) {
