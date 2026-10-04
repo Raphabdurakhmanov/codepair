@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getMyProfile, getSession } from "@/lib/data";
 import { getDict } from "@/lib/i18n";
-import { getAppearance } from "@/lib/theme";
+import { getAppearance, nextAccent } from "@/lib/theme";
 import { toggleAccent, toggleTheme } from "@/app/actions";
 import LangSwitcher from "./LangSwitcher";
 import NavLink from "./NavLink";
@@ -24,9 +24,9 @@ export default async function Shell({ children }: { children: React.ReactNode })
   );
   const accentSwitch = (
     <form action={toggleAccent}>
-      <input type="hidden" name="accent" value={accent === "blue" ? "red" : "blue"} />
+      <input type="hidden" name="accent" value={nextAccent(accent)} />
       <button className="rail-btn" type="submit" title={t.nav.accent} aria-label={t.nav.accent}>
-        <span className={`accent-dot accent-dot-${accent === "blue" ? "red" : "blue"}`} />
+        <span className={`accent-dot accent-dot-${nextAccent(accent)}`} />
       </button>
     </form>
   );

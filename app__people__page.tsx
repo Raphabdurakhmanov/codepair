@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireUser, loadMembers, teamRolesFor, toMatchPerson, completedCounts, type Profile, type Project, type Invitation } from "@/lib/data";
 import { getDict, fmt } from "@/lib/i18n";
+import { RoleOptions } from "@/components/RoleSelect";
 import { ROLES, SKILLS } from "@/lib/catalog";
 import { rankPeople, skillGap } from "@/lib/matching";
 import { inviteUser } from "@/app/actions";
@@ -86,9 +87,7 @@ export default async function PeoplePage({
         )}
         <select name="role" defaultValue={sp.role ?? ""} style={{ width: "auto" }} aria-label={t.people.role}>
           <option value="">{t.people.role}: {t.common.all}</option>
-          {ROLES.map((r) => (
-            <option key={r} value={r}>{t.roles[r]}</option>
-          ))}
+          <RoleOptions t={t} />
         </select>
         <select name="skill" defaultValue={sp.skill ?? ""} style={{ width: "auto" }} aria-label={t.people.skill}>
           <option value="">{t.people.skill}: {t.common.all}</option>
@@ -135,9 +134,7 @@ export default async function PeoplePage({
                       <input type="hidden" name="project_id" value={project.id} />
                       <input type="hidden" name="to_user" value={p.id} />
                       <select name="role" defaultValue={match?.covers[0] ?? p.roles[0] ?? ""} style={{ width: "auto", flex: 1 }} aria-label={t.people.inviteAs}>
-                        {p.roles.map((r) => (
-                          <option key={r} value={r}>{t.roles[r]}</option>
-                        ))}
+                        <RoleOptions t={t} only={p.roles} />
                       </select>
                       <button className="btn btn-primary btn-sm">{t.people.invite}</button>
                     </form>

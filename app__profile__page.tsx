@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/data";
 import { getDict, fmt } from "@/lib/i18n";
-import { INTERESTS, LEVELS, ROLES, SKILLS } from "@/lib/catalog";
+import { INTERESTS, LEVELS, SKILLS } from "@/lib/catalog";
+import { RoleChips } from "@/components/RoleSelect";
 import { saveProfile, syncGithub, connectTelegram, disconnectTelegram } from "@/app/actions";
 import ChipGroup from "@/components/ChipGroup";
 
@@ -51,7 +52,7 @@ export default async function ProfilePage({
 
           <fieldset>
             <legend className="label">{t.profile.roles}</legend>
-            <ChipGroup name="roles" options={ROLES.map((id) => ({ id, label: t.roles[id] }))} selected={p.roles} />
+            <RoleChips t={t} name="roles" selected={p.roles} />
             <p className="hint">{t.profile.rolesHint}</p>
           </fieldset>
 

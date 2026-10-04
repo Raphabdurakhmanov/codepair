@@ -43,7 +43,7 @@ export default function ProjectForm({
   action,
   initial,
   text,
-  roleOptions,
+  roleGroups,
   skillOptions,
   interestOptions,
   statusOptions,
@@ -52,7 +52,7 @@ export default function ProjectForm({
   action: (fd: FormData) => Promise<void>;
   initial: ProjectFormValues;
   text: ProjectFormText;
-  roleOptions: ChipOption[];
+  roleGroups: { id: string; label: string; options: ChipOption[] }[];
   skillOptions: ChipOption[];
   interestOptions: ChipOption[];
   statusOptions?: ChipOption[];
@@ -132,7 +132,14 @@ export default function ProjectForm({
 
         <fieldset>
           <legend className="label">{text.neededRoles}</legend>
-          <ChipGroup name="needed_roles" options={roleOptions} selected={v.needed_roles} onToggle={(id) => set("needed_roles", toggle(v.needed_roles, id))} />
+          <div className="role-groups">
+            {roleGroups.map((g) => (
+              <div key={g.id} className="role-group">
+                <div className="role-group-title">{g.label}</div>
+                <ChipGroup name="needed_roles" options={g.options} selected={v.needed_roles} onToggle={(id) => set("needed_roles", toggle(v.needed_roles, id))} />
+              </div>
+            ))}
+          </div>
         </fieldset>
 
         <fieldset>

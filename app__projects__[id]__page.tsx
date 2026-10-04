@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { requireUser, loadMembers, teamRolesFor, toMatchPerson, type Invitation, type Project } from "@/lib/data";
 import { getDict } from "@/lib/i18n";
 import { skillGap, scoreMatch } from "@/lib/matching";
-import { ROLES } from "@/lib/catalog";
+import { RoleOptions } from "@/components/RoleSelect";
 import {
   deleteProject,
   leaveProject,
@@ -163,11 +163,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                 <label className="field">
                   <span className="label">{t.project.requestRole}</span>
                   <select name="role" defaultValue={myMatch?.covers[0] ?? profile.roles[0] ?? ""}>
-                    {ROLES.map((r) => (
-                      <option key={r} value={r}>
-                        {t.roles[r]}
-                      </option>
-                    ))}
+                    <RoleOptions t={t} />
                   </select>
                 </label>
                 <textarea name="message" placeholder={t.project.messagePh} maxLength={1000} style={{ minHeight: 70 }} />

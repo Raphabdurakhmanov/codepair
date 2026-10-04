@@ -30,7 +30,8 @@ async function geminiPlan(idea: string, locale: string, key: string): Promise<Te
   const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
   const prompt = `You help students form balanced project teams.
 Given a project idea, choose the roles, technologies and domains needed for a realistic student MVP built in one semester.
-Prefer a small complementary team (3-5 roles), not several people with the same role.
+Prefer a small complementary team (3-6 roles), not several people with the same role.
+For security projects use security roles (pentest, soc, appsec, forensics, malware, cti, grc, ...).
 Use ONLY ids from these lists:
 roles: ${ROLES.join(", ")}
 tech: ${SKILLS.map((s) => s.id).join(", ")}
@@ -92,6 +93,14 @@ const RULES: { re: RegExp; roles?: string[]; tech?: string[]; interests?: string
   { re: /(туризм|путешеств|travel|tour|sayohat)/i, interests: ["travel"] },
   { re: /(iot|arduino|датчик|сенсор|sensor|raspberry)/i, interests: ["hardware"], tech: ["cpp"] },
   { re: /(telegram|телеграм|бот|bot)/i, roles: ["backend"], tech: ["python"] },
+  { re: /(кибер|безопасн|уязвим|пентест|взлом|ctf|htb|hack|security|vulnerab|pentest|phishing|фишинг|xavfsiz|zaiflik)/i, roles: ["pentest", "soc", "appsec"], tech: ["linux", "owasp", "burp"], interests: ["cybersecurity"] },
+  { re: /(siem|soc|инцидент|incident|лог|log monitoring|threat)/i, roles: ["soc", "cti"], tech: ["siem", "wireshark"], interests: ["cybersecurity"] },
+  { re: /(малвар|вредонос|malware|реверс|reverse|forensic|форензик)/i, roles: ["malware", "forensics"], tech: ["ghidra", "c"], interests: ["cybersecurity"] },
+  { re: /(облак|cloud|aws|azure|kubernetes|k8s|devops|инфраструкт|infrastructure)/i, roles: ["devops", "cloud"], tech: ["docker", "kubernetes", "terraform"] },
+  { re: /(блокчейн|blockchain|web3|крипто|crypto|nft|smart.?contract|смарт.?контракт)/i, roles: ["blockchain"], tech: ["solidity"], interests: ["blockchain"] },
+  { re: /(unity|unreal|игров|геймдев|gamedev)/i, roles: ["gamedev"], tech: ["unity", "csharp"], interests: ["games"] },
+  { re: /(ios|iphone|swift)/i, roles: ["ios"], tech: ["swift"] },
+  { re: /(android|kotlin)/i, roles: ["android"], tech: ["kotlin"] },
 ];
 
 export function keywordPlan(idea: string): TeamPlan {

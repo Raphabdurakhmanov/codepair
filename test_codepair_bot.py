@@ -149,7 +149,7 @@ class BotTests(unittest.TestCase):
         self.assertEqual(bot.deliver(), len(kinds))
         texts = [t for _, t in w.sent]
         self.assertIn("приглашает вас", texts[0])
-        self.assertIn("UI/UX дизайн", texts[0])
+        self.assertIn("UI/UX-дизайнер", texts[0])
         self.assertIn("Join us", texts[0])
         self.assertIn("Exam &lt;AI&gt;", texts[0])
         self.assertIn("хочет присоединиться", texts[1])
@@ -157,7 +157,7 @@ class BotTests(unittest.TestCase):
         self.assertIn("отклонил(а)", texts[3])
         self.assertIn("Вас приняли", texts[4])
         self.assertIn("Заявка", texts[5])
-        self.assertIn("ищет: UI/UX дизайн, Backend", texts[6])
+        self.assertIn("ищет: UI/UX-дизайнер, Backend", texts[6])
         self.assertIn("завершён", texts[7])
         self.assertTrue(all(n["sent_at"] for n in w.notifications))
         self.assertEqual(bot.deliver(), 0, "nothing is sent twice")
@@ -177,7 +177,7 @@ class BotTests(unittest.TestCase):
         pl = {"project": "P", "project_id": "1", "role": "data"}
         self.assertIn("tugallandi", cb.render("project_done", pl, "uz", "s"))
         self.assertIn("completed", cb.render("project_done", pl, "en", "s"))
-        self.assertIn("Ma’lumotlar", cb.render("project_done", pl, "uz", "s"))
+        self.assertIn("Ma’lumotlar tahlilchisi", cb.render("project_done", pl, "uz", "s"))
         with self.assertRaises(ValueError):
             cb.render("unknown", pl, "ru", "s")
 

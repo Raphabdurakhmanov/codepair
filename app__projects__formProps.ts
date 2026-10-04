@@ -1,4 +1,4 @@
-import { INTERESTS, ROLES, SKILLS } from "@/lib/catalog";
+import { INTERESTS, ROLE_GROUPS, SKILLS } from "@/lib/catalog";
 import type { Dict } from "@/lib/i18n";
 import type { ProjectFormText } from "./ProjectForm";
 
@@ -24,7 +24,7 @@ export function projectFormProps(t: Dict, submit: string) {
   };
   return {
     text,
-    roleOptions: ROLES.map((id) => ({ id, label: t.roles[id] })),
+    roleGroups: ROLE_GROUPS.map((g) => ({ id: g.id, label: t.roleGroups[g.id], options: g.roles.map((id) => ({ id, label: t.roles[id] ?? id })) })),
     skillOptions: SKILLS,
     interestOptions: INTERESTS.map((id) => ({ id, label: t.interests[id] })),
   };

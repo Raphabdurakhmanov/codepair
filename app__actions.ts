@@ -42,7 +42,8 @@ export async function toggleTheme(fd: FormData) {
 }
 
 export async function toggleAccent(fd: FormData) {
-  const next = fd.get("accent") === "red" ? "red" : "blue";
+  const v = fd.get("accent");
+  const next = v === "red" || v === "htb" ? v : "blue";
   (await cookies()).set("accent", next, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
   revalidatePath("/", "layout");
 }

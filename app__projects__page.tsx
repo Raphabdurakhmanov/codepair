@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireUser, loadMembers, teamRolesFor, toMatchPerson, type Project } from "@/lib/data";
 import { getDict } from "@/lib/i18n";
+import { RoleOptions } from "@/components/RoleSelect";
 import { ROLES } from "@/lib/catalog";
 import { scoreMatch, skillGap } from "@/lib/matching";
 import Tags from "@/components/Tags";
@@ -51,9 +52,7 @@ export default async function ProjectsPage({
       <form className="card row" style={{ marginBottom: 18, padding: 14, borderRadius: 24 }}>
         <select name="role" defaultValue={sp.role ?? ""} style={{ width: "auto" }} aria-label={t.people.role}>
           <option value="">{t.people.role}: {t.common.all}</option>
-          {ROLES.map((r) => (
-            <option key={r} value={r}>{t.roles[r]}</option>
-          ))}
+          <RoleOptions t={t} />
         </select>
         <label className="row small">
           <input type="checkbox" name="all" value="1" defaultChecked={!!sp.all} /> {t.projects.showAll}
