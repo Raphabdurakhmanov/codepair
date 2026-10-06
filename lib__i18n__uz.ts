@@ -2,6 +2,7 @@ import type { Dict } from "./ru";
 
 const uz: Dict = {
   common: {
+    close: "Yopish",
     tagline: "Ko‘nikmalardan — jamoaga. Jamoadan — haqiqiy loyihalarga.",
     save: "Saqlash",
     saved: "Saqlandi",
@@ -367,6 +368,13 @@ const uz: Dict = {
     project_done: "«{project}» tugallandi — tajriba profilga qo‘shildi",
     new_project: "Yangi «{project}» loyihasiga sizning rolingiz kerak",
     answered: "Siz javob berdingiz",
+  },
+  flash: {
+    alreadyAnswered: "Bu taklifga allaqachon javob berilgan — sahifani yangilang.",
+    notAllowed: "Bu amal uchun huquq yo‘q. To‘g‘ri akkauntga kirganingizni tekshiring.",
+    notFound: "Taklif topilmadi — u bekor qilingan bo‘lishi mumkin.",
+    duplicate: "Bu taklif allaqachon yuborilgan.",
+    failed: "Bajarilmadi",
   },
 };
 

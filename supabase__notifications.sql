@@ -30,11 +30,20 @@ create or replace function public.notify(uid uuid, k text, data jsonb) returns v
 language plpgsql security definer set search_path = public as $$
 begin
   if uid is null then return; end if;
-  insert into public.site_notifications (user_id, kind, payload) values (uid, k, data);
+  -- уведомление никогда не должно ломать основное действие (принять приглашение и т.п.)
+  begin
+    insert into public.site_notifications (user_id, kind, payload) values (uid, k, data);
+  exception when others then
+    raise warning 'site notification failed: %', sqlerrm;
+  end;
   if to_regclass('public.telegram_links') is not null then
-    insert into public.notifications (user_id, kind, payload)
-    select user_id, k, data from public.telegram_links
-     where user_id = uid and chat_id is not null and enabled;
+    begin
+      insert into public.notifications (user_id, kind, payload)
+      select user_id, k, data from public.telegram_links
+       where user_id = uid and chat_id is not null and enabled;
+    exception when others then
+      raise warning 'telegram notification failed: %', sqlerrm;
+    end;
   end if;
 end $$;
 revoke execute on function public.notify(uuid, text, jsonb) from public, anon, authenticated;
@@ -76,6 +85,7 @@ begin
     if new.status = 'open' and cardinality(new.needed_roles) > 0
        and to_regclass('public.telegram_links') is not null then
       select full_name into owner_name from public.profiles where id = new.owner_id;
+      begin
       insert into public.notifications (user_id, kind, payload)
       select l.user_id, 'new_project',
              jsonb_build_object(
@@ -88,6 +98,9 @@ begin
         and l.user_id <> new.owner_id
         and p.roles && new.needed_roles
       limit 500;
+      exception when others then
+        raise warning 'new_project notification failed: %', sqlerrm;
+      end;
     end if;
   elsif new.status = 'done' and old.status is distinct from 'done' then
     perform public.notify(m.user_id, 'project_done',
@@ -147,17 +160,47 @@ begin
   if new.role = 'owner' then return null; end if;              -- автор при создании проекта
   select id, title, owner_id into proj from public.projects where id = new.project_id;
   select full_name into who from public.profiles where id = new.user_id;
+  begin
   insert into public.site_notifications (user_id, kind, payload)
   select m.user_id, 'member_joined',
          jsonb_build_object('project_id', proj.id, 'project', proj.title, 'by', who, 'by_id', new.user_id, 'role', new.role)
     from public.project_members m
    where m.project_id = new.project_id and m.user_id <> new.user_id and m.user_id <> proj.owner_id;
+  exception when others then
+    raise warning 'member_joined notification failed: %', sqlerrm;
+  end;
   return null;
 end $$;
 
 drop trigger if exists members_joined on public.project_members;
 create trigger members_joined after insert on public.project_members
   for each row execute function public.on_member_joined();
+
+-- мгновенная отправка в Telegram тоже не должна ломать действие на сайте
+do $do$
+begin
+  if to_regclass('public.bot_state') is not null then
+    execute $f$
+    create or replace function public.tg_kick_delivery() returns trigger
+    language plpgsql security definer set search_path = public as $$
+    declare secret text; site text;
+    begin
+      select value into secret from public.bot_state where key = 'deliver_secret';
+      select value into site from public.bot_state where key = 'site_url';
+      if secret is null or site is null then return null; end if;
+      begin
+        perform net.http_post(
+          url := rtrim(site, '/') || '/api/telegram/deliver',
+          body := '{}'::jsonb,
+          headers := jsonb_build_object('Content-Type', 'application/json', 'x-codepair-secret', secret));
+      exception when others then
+        raise warning 'telegram kick failed: %', sqlerrm;
+      end;
+      return null;
+    end $$;
+    $f$;
+  end if;
+end $do$;
 
 -- старые уведомления (старше 90 дней) можно чистить вручную:
 -- delete from public.site_notifications where created_at < now() - interval '90 days';

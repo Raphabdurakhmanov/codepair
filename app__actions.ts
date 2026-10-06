@@ -12,6 +12,13 @@ import { fetchGithubSummary } from "@/lib/github";
 
 const str = (fd: FormData, k: string, max = 2000) => String(fd.get(k) ?? "").trim().slice(0, max);
 const list = (fd: FormData, k: string) => fd.getAll(k).map(String);
+/** Show a short message on the next page (read by Shell → FlashBanner). */
+async function flash(error: { message: string } | null | undefined) {
+  if (!error) return false;
+  (await cookies()).set("flash", error.message.slice(0, 200), { path: "/", maxAge: 30, httpOnly: false, sameSite: "lax" });
+  return true;
+}
+
 const safeUrl = (v: string) => (v === "" || /^https?:\/\/\S+$/i.test(v) ? v : "");
 
 async function authed() {
@@ -175,13 +182,14 @@ export async function deleteProject(fd: FormData) {
 export async function inviteUser(fd: FormData) {
   const { supabase, user } = await authed();
   const role = str(fd, "role", 40);
-  await supabase.from("invitations").insert({
+  const { error } = await supabase.from("invitations").insert({
     project_id: str(fd, "project_id", 64),
     from_user: user.id,
     to_user: str(fd, "to_user", 64),
     kind: "invite",
     role: isRole(role) ? role : "",
   });
+  await flash(error);
   revalidatePath("/", "layout");
 }
 
@@ -191,7 +199,7 @@ export async function requestJoin(fd: FormData) {
   const { data: project } = await supabase.from("projects").select("owner_id").eq("id", projectId).single();
   if (!project) return;
   const role = str(fd, "role", 40);
-  await supabase.from("invitations").insert({
+  const { error } = await supabase.from("invitations").insert({
     project_id: projectId,
     from_user: user.id,
     to_user: project.owner_id,
@@ -199,28 +207,33 @@ export async function requestJoin(fd: FormData) {
     role: isRole(role) ? role : "",
     message: str(fd, "message", 1000),
   });
+  await flash(error);
   revalidatePath(`/projects/${projectId}`);
 }
 
 export async function respondInvitation(fd: FormData) {
-  const { supabase } = await authed();
-  await supabase.rpc("respond_invitation", {
-    inv_id: str(fd, "id", 64),
-    accept: fd.get("accept") === "1",
-  });
+  const { supabase, user } = await authed();
+  const invId = str(fd, "id", 64);
+  const accept = fd.get("accept") === "1";
+  const { data: inv } = await supabase.from("invitations").select("project_id, kind, to_user").eq("id", invId).maybeSingle();
+  const { error } = await supabase.rpc("respond_invitation", { inv_id: invId, accept });
+  await flash(error);
   revalidatePath("/", "layout");
+  // accepted an invitation → straight to the new team
+  if (!error && accept && inv && inv.kind === "invite" && inv.to_user === user.id) redirect(`/team?project=${inv.project_id}`);
 }
 
 export async function cancelInvitation(fd: FormData) {
   const { supabase } = await authed();
-  await supabase.from("invitations").delete().eq("id", str(fd, "id", 64));
+  const { error } = await supabase.from("invitations").delete().eq("id", str(fd, "id", 64));
+  await flash(error);
   revalidatePath("/", "layout");
 }
 
 export async function leaveProject(fd: FormData) {
   const { supabase } = await authed();
   const id = str(fd, "project_id", 64);
-  await supabase.rpc("leave_project", { p: id });
+  await flash((await supabase.rpc("leave_project", { p: id })).error);
   revalidatePath("/", "layout");
   redirect(`/projects/${id}`);
 }
@@ -228,7 +241,7 @@ export async function leaveProject(fd: FormData) {
 export async function removeMember(fd: FormData) {
   const { supabase } = await authed();
   const id = str(fd, "project_id", 64);
-  await supabase.from("project_members").delete().eq("project_id", id).eq("user_id", str(fd, "user_id", 64));
+  await flash((await supabase.from("project_members").delete().eq("project_id", id).eq("user_id", str(fd, "user_id", 64))).error);
   revalidatePath("/", "layout");
 }
 
@@ -236,18 +249,19 @@ export async function setMemberRole(fd: FormData) {
   const { supabase } = await authed();
   const id = str(fd, "project_id", 64);
   const role = str(fd, "role", 40);
-  await supabase.rpc("set_member_role", {
+  const { error } = await supabase.rpc("set_member_role", {
     p: id,
     member: str(fd, "user_id", 64),
     new_role: isRole(role) ? role : "",
   });
+  await flash(error);
   revalidatePath("/", "layout");
 }
 
 export async function transferOwnership(fd: FormData) {
   const { supabase } = await authed();
   const id = str(fd, "project_id", 64);
-  await supabase.rpc("transfer_ownership", { p: id, new_owner: str(fd, "user_id", 64) });
+  await flash((await supabase.rpc("transfer_ownership", { p: id, new_owner: str(fd, "user_id", 64) })).error);
   revalidatePath("/", "layout");
   redirect(`/team?project=${id}`);
 }

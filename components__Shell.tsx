@@ -9,6 +9,8 @@ import Icon from "./Icons";
 import Avatar from "./Avatar";
 import Logo from "./Logo";
 import NotificationBell from "./NotificationBell";
+import FlashBanner from "./FlashBanner";
+import { cookies } from "next/headers";
 
 export default async function Shell({ children }: { children: React.ReactNode }) {
   const { locale, t } = await getDict();
@@ -53,7 +55,19 @@ export default async function Shell({ children }: { children: React.ReactNode })
     );
   }
 
-  const [profile, unread] = await Promise.all([getMyProfile(), getUnreadCount()]);
+  const [profile, unread, jar] = await Promise.all([getMyProfile(), getUnreadCount(), cookies()]);
+  const flashRaw = jar.get("flash")?.value ?? "";
+  const flashText = !flashRaw
+    ? ""
+    : /already answered/i.test(flashRaw)
+      ? t.flash.alreadyAnswered
+      : /not allowed|permission|row-level security/i.test(flashRaw)
+        ? t.flash.notAllowed
+        : /not found/i.test(flashRaw)
+          ? t.flash.notFound
+          : /duplicate|unique/i.test(flashRaw)
+            ? t.flash.duplicate
+            : `${t.flash.failed}: ${flashRaw}`;
 
   return (
     <div className="app">
@@ -104,7 +118,10 @@ export default async function Shell({ children }: { children: React.ReactNode })
             </Link>
           </div>
         </header>
-        <main className="app-content">{children}</main>
+        <main className="app-content">
+          {flashText && <FlashBanner message={flashText} closeLabel={t.common.close} />}
+          {children}
+        </main>
       </div>
     </div>
   );

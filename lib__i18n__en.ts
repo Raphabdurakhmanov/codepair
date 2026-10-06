@@ -2,6 +2,7 @@ import type { Dict } from "./ru";
 
 const en: Dict = {
   common: {
+    close: "Close",
     tagline: "From skills to teams. From teams to real projects.",
     save: "Save",
     saved: "Saved",
@@ -366,6 +367,13 @@ const en: Dict = {
     project_done: "“{project}” is completed — experience added to your profile",
     new_project: "New project “{project}” needs your role",
     answered: "You answered",
+  },
+  flash: {
+    alreadyAnswered: "This invitation has already been answered — refresh the page.",
+    notAllowed: "You are not allowed to do this. Check that you are signed in to the right account.",
+    notFound: "Invitation not found — it may have been cancelled.",
+    duplicate: "This invitation was already sent.",
+    failed: "Something went wrong",
   },
 };
 
