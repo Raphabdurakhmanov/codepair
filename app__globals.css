@@ -478,3 +478,36 @@ details.inline[open] summary { margin-bottom: 10px; }
   .member-actions { width: 100%; padding-left: 48px; }
   .member-menu { right: auto; left: 0; }
 }
+
+/* ---------- notifications ---------- */
+.bell { position: relative; width: 46px; height: 46px; border-radius: 16px; }
+.bell-badge {
+  position: absolute; top: -5px; right: -5px; min-width: 20px; height: 20px; padding: 0 5px;
+  border-radius: 999px; background: var(--accent); color: var(--accent-text);
+  font-size: 0.68rem; font-weight: 800; display: grid; place-items: center;
+  box-shadow: 0 0 0 3px var(--bg-2), 0 4px 12px var(--accent-glow);
+}
+.notif-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.notif {
+  display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px; border-radius: var(--r-md);
+  background: var(--glass); border: 1px solid var(--glass-border);
+}
+.notif.is-unread { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
+.notif-icon { font-size: 1.25rem; line-height: 1.4; width: 28px; text-align: center; flex: none; }
+.notif-body { flex: 1; min-width: 0; }
+.notif-body a.notif-text { color: var(--text); font-weight: 600; }
+.notif-time { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+.notif-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.notif-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); flex: none; margin-top: 8px; }
+
+/* ---------- team page ---------- */
+.team-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.team-tab {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px;
+  background: var(--glass); border: 1px solid var(--glass-border); color: var(--text); font-weight: 600; font-size: 0.88rem;
+}
+.team-tab:hover { text-decoration: none; background: var(--glass-hover); }
+.team-tab.is-active { background: var(--accent); color: var(--accent-text); border-color: transparent; }
+.team-tab .count { font-size: 0.72rem; opacity: 0.8; }
+.team-tab .badge { background: var(--warn); color: #111; border-radius: 999px; padding: 0 7px; font-size: 0.7rem; font-weight: 800; }
+.team-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; }

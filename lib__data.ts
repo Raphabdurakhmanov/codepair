@@ -89,6 +89,17 @@ export const getMyProfile = cache(async (): Promise<Profile | null> => {
   return (data as Profile) ?? null;
 });
 
+/** Unread site notifications (0 if notifications.sql was not run yet). */
+export const getUnreadCount = cache(async (): Promise<number> => {
+  const { supabase, user } = await getSession();
+  if (!user) return 0;
+  const { count, error } = await supabase
+    .from("site_notifications")
+    .select("id", { count: "exact", head: true })
+    .is("read_at", null);
+  return error ? 0 : count ?? 0;
+});
+
 /** Current user + profile, or redirect to /login. */
 export async function requireUser() {
   const { supabase, user } = await getSession();

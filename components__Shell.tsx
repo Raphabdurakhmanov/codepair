@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getMyProfile, getSession } from "@/lib/data";
+import { getMyProfile, getSession, getUnreadCount } from "@/lib/data";
 import { getDict } from "@/lib/i18n";
 import { getAppearance, nextAccent } from "@/lib/theme";
 import { toggleAccent, toggleTheme } from "@/app/actions";
@@ -8,6 +8,7 @@ import NavLink from "./NavLink";
 import Icon from "./Icons";
 import Avatar from "./Avatar";
 import Logo from "./Logo";
+import NotificationBell from "./NotificationBell";
 
 export default async function Shell({ children }: { children: React.ReactNode }) {
   const { locale, t } = await getDict();
@@ -52,7 +53,7 @@ export default async function Shell({ children }: { children: React.ReactNode })
     );
   }
 
-  const profile = await getMyProfile();
+  const [profile, unread] = await Promise.all([getMyProfile(), getUnreadCount()]);
 
   return (
     <div className="app">
@@ -63,6 +64,7 @@ export default async function Shell({ children }: { children: React.ReactNode })
         <nav className="rail-group">
           <NavLink href="/dashboard" title={t.nav.dashboard}><Icon name="home" /></NavLink>
           <NavLink href="/projects" title={t.nav.projects}><Icon name="folder" /></NavLink>
+          <NavLink href="/team" title={t.nav.team}><Icon name="team" /></NavLink>
           <NavLink href="/people" title={t.nav.people}><Icon name="users" /></NavLink>
           <NavLink href="/profile" title={t.nav.profile}><Icon name="user" /></NavLink>
         </nav>
@@ -89,6 +91,7 @@ export default async function Shell({ children }: { children: React.ReactNode })
           </div>
           <div className="topbar-right">
             <LangSwitcher current={locale} />
+            <NotificationBell initial={unread} title={t.nav.notifications} />
             <Link href={`/u/${user.id}`} className="pill-group">
               <Avatar name={profile?.full_name ?? ""} url={profile?.avatar_url} />
               <span className="pill-text">

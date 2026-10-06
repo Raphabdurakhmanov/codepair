@@ -36,6 +36,15 @@ const paths: Record<string, React.ReactNode> = {
   spark: <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" />,
   check: <path d="M5 12.5 10 17 19 7" />,
   arrow: <path d="M7 17 17 7M9 7h8v8" />,
+  bell: <path d="M6 9a6 6 0 1 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9zM10 19.5a2 2 0 0 0 4 0" />,
+  team: (
+    <>
+      <circle cx="12" cy="7.5" r="3" />
+      <circle cx="5" cy="10" r="2.2" />
+      <circle cx="19" cy="10" r="2.2" />
+      <path d="M6.5 20c.6-3.3 2.8-5 5.5-5s4.9 1.7 5.5 5M1.8 18.5c.4-2 1.6-3.3 3.4-3.6M22.2 18.5c-.4-2-1.6-3.3-3.4-3.6" />
+    </>
+  ),
   inbox: <path d="M3 13h5l1.5 3h5L16 13h5M5 5h14l2 8v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-6z" />,
 };
 

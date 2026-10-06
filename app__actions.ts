@@ -160,7 +160,7 @@ export async function setProjectStatus(fd: FormData) {
   const status = str(fd, "status", 20);
   if (!["open", "in_progress", "done"].includes(status)) return;
   await supabase.from("projects").update({ status }).eq("id", id);
-  revalidatePath(`/projects/${id}`);
+  revalidatePath("/", "layout");
 }
 
 export async function deleteProject(fd: FormData) {
@@ -182,7 +182,7 @@ export async function inviteUser(fd: FormData) {
     kind: "invite",
     role: isRole(role) ? role : "",
   });
-  revalidatePath("/people");
+  revalidatePath("/", "layout");
 }
 
 export async function requestJoin(fd: FormData) {
@@ -229,7 +229,7 @@ export async function removeMember(fd: FormData) {
   const { supabase } = await authed();
   const id = str(fd, "project_id", 64);
   await supabase.from("project_members").delete().eq("project_id", id).eq("user_id", str(fd, "user_id", 64));
-  revalidatePath(`/projects/${id}`);
+  revalidatePath("/", "layout");
 }
 
 export async function setMemberRole(fd: FormData) {
@@ -241,7 +241,7 @@ export async function setMemberRole(fd: FormData) {
     member: str(fd, "user_id", 64),
     new_role: isRole(role) ? role : "",
   });
-  revalidatePath(`/projects/${id}`);
+  revalidatePath("/", "layout");
 }
 
 export async function transferOwnership(fd: FormData) {
@@ -249,13 +249,26 @@ export async function transferOwnership(fd: FormData) {
   const id = str(fd, "project_id", 64);
   await supabase.rpc("transfer_ownership", { p: id, new_owner: str(fd, "user_id", 64) });
   revalidatePath("/", "layout");
-  redirect(`/projects/${id}`);
+  redirect(`/team?project=${id}`);
 }
 
-/** Owner invites someone straight from the project page (same rules as on /people). */
+/** Owner invites someone straight from the team page (same rules as on /people). */
 export async function inviteToProject(fd: FormData) {
   await inviteUser(fd);
-  revalidatePath(`/projects/${str(fd, "project_id", 64)}`);
+}
+
+// ---------- site notifications ----------
+
+export async function markNotificationsRead() {
+  const { supabase } = await authed();
+  await supabase.from("site_notifications").update({ read_at: new Date().toISOString() }).is("read_at", null);
+  revalidatePath("/", "layout");
+}
+
+export async function clearReadNotifications() {
+  const { supabase } = await authed();
+  await supabase.from("site_notifications").delete().not("read_at", "is", null);
+  revalidatePath("/", "layout");
 }
 
 export async function saveContribution(fd: FormData) {
