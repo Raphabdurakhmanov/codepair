@@ -181,6 +181,13 @@ class BotTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             cb.render("unknown", pl, "ru", "s")
 
+    def test_team_management_kinds(self):
+        pl = {"project": "P", "project_id": "1", "by": "Ann", "role": "pentest"}
+        self.assertIn("исключил", cb.render("member_removed", pl, "ru", "s"))
+        self.assertIn("left your project", cb.render("member_left", pl, "en", "s"))
+        self.assertIn("Пентестер / Red Team", cb.render("role_changed", pl, "ru", "s"))
+        self.assertIn("muallif", cb.render("ownership_received", pl, "uz", "s"))
+
     def test_lang_detection(self):
         self.assertEqual(cb.lang_of("uz-UZ"), "uz")
         self.assertEqual(cb.lang_of("ru"), "ru")

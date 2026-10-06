@@ -6,6 +6,7 @@ import { ROLES } from "@/lib/catalog";
 import { scoreMatch, skillGap } from "@/lib/matching";
 import Tags from "@/components/Tags";
 import MatchScore from "@/components/MatchScore";
+import MemberStack from "@/components/MemberStack";
 
 export default async function ProjectsPage({
   searchParams,
@@ -30,6 +31,7 @@ export default async function ProjectsPage({
       const roles = teamRolesFor(team);
       return {
         p,
+        team,
         size: team.length,
         mine: team.some((m) => m.user_id === profile.id),
         gap: skillGap(p, roles),
@@ -64,13 +66,16 @@ export default async function ProjectsPage({
         <div className="empty">{t.projects.noResults}</div>
       ) : (
         <div className="grid">
-          {rows.map(({ p, size, mine, gap, match }) => (
+          {rows.map(({ p, team, size, mine, gap, match }) => (
             <Link key={p.id} href={`/projects/${p.id}`} className="card" style={{ color: "inherit", textDecoration: "none" }}>
               <div className="row between">
                 <span className="tag">{t.status[p.status]} · 👥 {size}</span>
                 {mine && <span className="tag tag-good">{t.project.youAreMember}</span>}
               </div>
               <h3 style={{ marginTop: 10 }}>{p.title}</h3>
+              <div style={{ margin: "-4px 0 8px" }}>
+                <MemberStack members={team} />
+              </div>
               <p className="muted small" style={{ display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                 {p.description}
               </p>

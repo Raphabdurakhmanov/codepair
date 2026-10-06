@@ -232,6 +232,32 @@ export async function removeMember(fd: FormData) {
   revalidatePath(`/projects/${id}`);
 }
 
+export async function setMemberRole(fd: FormData) {
+  const { supabase } = await authed();
+  const id = str(fd, "project_id", 64);
+  const role = str(fd, "role", 40);
+  await supabase.rpc("set_member_role", {
+    p: id,
+    member: str(fd, "user_id", 64),
+    new_role: isRole(role) ? role : "",
+  });
+  revalidatePath(`/projects/${id}`);
+}
+
+export async function transferOwnership(fd: FormData) {
+  const { supabase } = await authed();
+  const id = str(fd, "project_id", 64);
+  await supabase.rpc("transfer_ownership", { p: id, new_owner: str(fd, "user_id", 64) });
+  revalidatePath("/", "layout");
+  redirect(`/projects/${id}`);
+}
+
+/** Owner invites someone straight from the project page (same rules as on /people). */
+export async function inviteToProject(fd: FormData) {
+  await inviteUser(fd);
+  revalidatePath(`/projects/${str(fd, "project_id", 64)}`);
+}
+
 export async function saveContribution(fd: FormData) {
   const { supabase, user } = await authed();
   const id = str(fd, "project_id", 64);

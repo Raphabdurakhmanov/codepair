@@ -4,6 +4,7 @@ import { getDict, fmt } from "@/lib/i18n";
 import { scoreMatch } from "@/lib/matching";
 import { respondInvitation, cancelInvitation } from "@/app/actions";
 import Avatar from "@/components/Avatar";
+import MemberStack from "@/components/MemberStack";
 import { Score } from "@/components/MatchScore";
 
 export default async function Dashboard() {
@@ -30,11 +31,12 @@ export default async function Dashboard() {
   // wave 2: details that depend on wave 1, also in parallel
   const relatedProjectIds = [...new Set([...myIds, ...invitations.map((i) => i.project_id)])];
   const peopleIds = [...new Set(invitations.flatMap((i) => [i.from_user, i.to_user]))];
-  const [{ data: projData }, { data: pplData }, openMembers] = await Promise.all([
+  const [{ data: projData }, { data: pplData }, allMembers] = await Promise.all([
     relatedProjectIds.length ? supabase.from("projects").select("*").in("id", relatedProjectIds) : Promise.resolve({ data: [] }),
     peopleIds.length ? supabase.from("profiles").select("*").in("id", peopleIds) : Promise.resolve({ data: [] }),
-    loadMembers(supabase, open.map((p) => p.id)),
+    loadMembers(supabase, [...open.map((p) => p.id), ...myIds]),
   ]);
+  const openMembers = allMembers;
   const projectsById = new Map(((projData ?? []) as Project[]).map((p) => [p.id, p]));
   const peopleById = new Map(((pplData ?? []) as Profile[]).map((p) => [p.id, p]));
   const myProjects = myIds.map((id) => projectsById.get(id)).filter((p): p is Project => !!p);
@@ -241,7 +243,10 @@ export default async function Dashboard() {
             <div style={{ marginTop: 14 }}>
               {myProjects.map((p) => (
                 <Link key={p.id} href={`/projects/${p.id}`} className="list-item" style={{ justifyContent: "space-between" }}>
-                  <b>{p.title}</b>
+                  <span className="row" style={{ gap: 10, minWidth: 0 }}>
+                    <b>{p.title}</b>
+                    <MemberStack members={allMembers.filter((m) => m.project_id === p.id)} max={4} />
+                  </span>
                   <span className={`tag ${p.status === "done" ? "tag-good" : p.status === "open" ? "tag-accent" : "tag-warn"}`}>{t.status[p.status]}</span>
                 </Link>
               ))}

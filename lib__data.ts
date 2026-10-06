@@ -115,12 +115,20 @@ type Supa = Awaited<ReturnType<typeof createClient>>;
 /** Members of the given projects with their profiles. */
 export async function loadMembers(supabase: Supa, projectIds: string[]): Promise<Member[]> {
   if (projectIds.length === 0) return [];
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("project_members")
-    .select("*, profile:profiles(*)")
+    .select("*, profile:profiles!project_members_user_id_fkey(*)")
     .in("project_id", projectIds)
     .order("joined_at");
-  return (data ?? []) as Member[];
+  if (!error && data) return data as Member[];
+
+  // fallback without embedding: members first, then their profiles
+  const { data: rows } = await supabase.from("project_members").select("*").in("project_id", projectIds).order("joined_at");
+  const list = (rows ?? []) as Omit<Member, "profile">[];
+  const ids = [...new Set(list.map((m) => m.user_id))];
+  const { data: profs } = ids.length ? await supabase.from("profiles").select("*").in("id", ids) : { data: [] };
+  const byId = new Map(((profs ?? []) as Profile[]).map((p) => [p.id, p]));
+  return list.map((m) => ({ ...m, profile: byId.get(m.user_id) as Profile }));
 }
 
 export function teamRolesFor(members: Member[]): string[] {
